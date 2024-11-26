@@ -8,15 +8,17 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
+import static ru.example.quoridor.property.Property.PORT;
+
 public class SocketClient {
     private final ClientManager manager = BClientManager.getManager();
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
 
-    SocketClient() {
+    public SocketClient() {
         try {
             InetAddress ip = InetAddress.getLocalHost();
-            Socket socket = new Socket(ip, 5555);
+            Socket socket = new Socket(ip, PORT);
             ois = new ObjectInputStream(socket.getInputStream());
             oos = new ObjectOutputStream(socket.getOutputStream());
         }

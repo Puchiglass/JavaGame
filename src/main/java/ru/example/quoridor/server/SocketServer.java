@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import static ru.example.quoridor.property.Property.PORT;
+
 @AllArgsConstructor
 public class SocketServer {
 
@@ -15,7 +17,7 @@ public class SocketServer {
     public void waitNewPlayers() {
         try {
             InetAddress ip = InetAddress.getLocalHost();
-            ServerSocket ss = new ServerSocket(5555, 0, ip);
+            ServerSocket ss = new ServerSocket(PORT, 0, ip);
             Socket cs;
             while (true) {
                 cs = ss.accept();
