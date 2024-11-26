@@ -13,7 +13,7 @@ public class ServerManager {
     private final HashMap<Integer, Integer> playerIdByPort = new HashMap<>();
 
     @Getter
-    private ArrayList<Player> players = new ArrayList<>();
+    private final ArrayList<Player> players = new ArrayList<>();
 
     public void runServer() {
         socket.waitNewPlayers();

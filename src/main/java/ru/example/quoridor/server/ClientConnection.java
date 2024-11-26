@@ -1,5 +1,7 @@
 package ru.example.quoridor.server;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.example.quoridor.messages.*;
 
 import java.io.IOException;
@@ -9,6 +11,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class ClientConnection {
+
+    private static final Logger log = LogManager.getLogger(ClientConnection.class);
+
     private final Socket socket;
     private final ServerManager manager;
 
@@ -23,7 +28,7 @@ public class ClientConnection {
             ois = new ObjectInputStream(this.socket.getInputStream());
         }
         catch (IOException e) {
-            System.out.println("Error receiving streams! port - " + this.socket.getPort());
+            log.error("Error receiving streams on port %d".formatted(this.socket.getPort()));
         }
         Thread thread = new Thread(this::run);
         thread.setDaemon(true);
@@ -48,11 +53,11 @@ public class ClientConnection {
                 }
             }
             catch (IOException e) {
-                System.out.println("Client disconnect!");
+                log.error("Client disconnect");
                 break;
             }
             catch (ClassNotFoundException e) {
-                System.out.println(e.getMessage());
+                log.error(e.getMessage());
             }
         }
     }
@@ -62,7 +67,7 @@ public class ClientConnection {
             oos.writeObject(new StartGameMsg(isCurMove, numPlayers));
         }
         catch (IOException e) {
-            System.out.println("Failed to send the start message! port - " + getPort());
+            log.error("Failed to send the start message on port - %d".formatted(getPort()));
         }
     }
 
@@ -71,7 +76,7 @@ public class ClientConnection {
             oos.writeObject(new UpdateGameStatusMsg(painterId, line, cells, isCurMove));
         }
         catch (IOException e) {
-            System.out.println("Failed to send update field! port - " + getPort());
+            log.error("Failed to send update field on port - %d".formatted(getPort()));
         }
     }
 
@@ -82,7 +87,7 @@ public class ClientConnection {
             oos.reset();
         }
         catch (IOException e) {
-            System.out.println("Failed to send finish result! port - " + getPort());
+            log.error("Failed to send finish result on port - %d".formatted(getPort()));
         }
     }
 }

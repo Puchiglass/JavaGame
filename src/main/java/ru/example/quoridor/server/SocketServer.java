@@ -1,6 +1,8 @@
 package ru.example.quoridor.server;
 
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -11,6 +13,8 @@ import static ru.example.quoridor.property.Property.PORT;
 
 @AllArgsConstructor
 public class SocketServer {
+
+    private static final Logger log = LogManager.getLogger(SocketServer.class);
 
     private final ServerManager manager;
 
@@ -25,13 +29,13 @@ public class SocketServer {
                     cs.close();
                     continue;
                 }
-                System.out.println("New client! port - " + cs.getPort());
+                log.info("New client on port %d".formatted(cs.getPort()));
                 ClientConnection cc = new ClientConnection(cs, manager);
                 manager.addNewPlayer(cc);
             }
         }
         catch (IOException ex) {
-            System.out.println("Server startup error!");
+            log.error("Server start error");
         }
     }
 }

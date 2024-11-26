@@ -6,6 +6,7 @@ import ru.example.quoridor.messages.PaintingLine;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class Game {
     private static final int FIELD_SIZE = 3;
@@ -36,7 +37,7 @@ public class Game {
         Arrays.fill(verticalLines, false);
         Arrays.fill(horizontalLines, false);
         Arrays.fill(cells, 0);
-        playerScore.replaceAll(ignored -> 0);
+        Collections.fill(playerScore, 0);
 
     }
 
