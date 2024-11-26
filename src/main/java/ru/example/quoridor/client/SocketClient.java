@@ -9,16 +9,14 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 public class SocketClient {
-    ClientManager manager = BClientManager.getManager();
-    Socket socket;
-    ObjectInputStream ois;
-    ObjectOutputStream oos;
-    int port = 5555;
+    private final ClientManager manager = BClientManager.getManager();
+    private ObjectInputStream ois;
+    private ObjectOutputStream oos;
 
     SocketClient() {
         try {
             InetAddress ip = InetAddress.getLocalHost();
-            socket = new Socket(ip, port);
+            Socket socket = new Socket(ip, 5555);
             ois = new ObjectInputStream(socket.getInputStream());
             oos = new ObjectOutputStream(socket.getOutputStream());
         }
@@ -65,7 +63,7 @@ public class SocketClient {
 
     public void sendLine(int id, LineType type) {
         try {
-            oos.writeObject(new PaintingLine(id, type));
+            oos.writeObject(new PaintingLine(type, id));
         }
         catch (IOException e) {
             System.out.println("Failed to send line message!");

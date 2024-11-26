@@ -1,21 +1,21 @@
 package ru.example.quoridor.server;
 
+import lombok.AllArgsConstructor;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+@AllArgsConstructor
 public class SocketServer {
-    ServerManager manager;
-    int port = 5555;
-    SocketServer(ServerManager manager_) {
-        manager = manager_;
-    }
 
-    void waitNewPlayers() {
+    private final ServerManager manager;
+
+    public void waitNewPlayers() {
         try {
             InetAddress ip = InetAddress.getLocalHost();
-            ServerSocket ss = new ServerSocket(port, 0, ip);
+            ServerSocket ss = new ServerSocket(5555, 0, ip);
             Socket cs;
             while (true) {
                 cs = ss.accept();

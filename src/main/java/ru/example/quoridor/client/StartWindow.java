@@ -9,9 +9,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class StartWindow {
-    ClientManager manager = BClientManager.getManager();
-    Label info;
-    Stage window;
+    private final ClientManager manager = BClientManager.getManager();
+    private Label info;
+    private Stage window;
 
     public void show() {
         window = new Stage();
@@ -27,9 +27,9 @@ public class StartWindow {
         info = new Label("Нажмите \"Готов\" для начала игры");
         vBox.getChildren().add(info);
 
-        Button ready_btn = new Button("Готов");
-        ready_btn.setOnAction(event-> readyAction());
-        vBox.getChildren().add(ready_btn);
+        Button readyBtn = new Button("Готов");
+        readyBtn.setOnAction(event-> readyAction());
+        vBox.getChildren().add(readyBtn);
 
         window.showAndWait();
     }

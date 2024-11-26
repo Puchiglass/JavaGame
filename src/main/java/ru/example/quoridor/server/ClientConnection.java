@@ -9,20 +9,21 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class ClientConnection {
-    Socket socket;
-    ObjectInputStream ois;
-    ObjectOutputStream oos;
-    ServerManager manager;
+    private final Socket socket;
+    private final ServerManager manager;
 
-    ClientConnection(Socket socket_, ServerManager manager_) {
-        socket = socket_;
-        manager = manager_;
+    private ObjectInputStream ois;
+    private ObjectOutputStream oos;
+
+    public ClientConnection(Socket socket, ServerManager manager) {
+        this.socket = socket;
+        this.manager = manager;
         try {
-            oos = new ObjectOutputStream(socket.getOutputStream());
-            ois = new ObjectInputStream(socket.getInputStream());
+            oos = new ObjectOutputStream(this.socket.getOutputStream());
+            ois = new ObjectInputStream(this.socket.getInputStream());
         }
         catch (IOException e) {
-            System.out.println("Error receiving streams! port - " + socket.getPort());
+            System.out.println("Error receiving streams! port - " + this.socket.getPort());
         }
         Thread thread = new Thread(this::run);
         thread.setDaemon(true);
@@ -56,28 +57,28 @@ public class ClientConnection {
         }
     }
 
-    void sendStartGame(boolean is_cur_move, int num_players) {
+    void sendStartGame(boolean isCurMove, int numPlayers) {
         try {
-            oos.writeObject(new StartGameMsg(is_cur_move, num_players));
+            oos.writeObject(new StartGameMsg(isCurMove, numPlayers));
         }
         catch (IOException e) {
             System.out.println("Failed to send the start message! port - " + getPort());
         }
     }
 
-    void sendUpdateGameStatus(int painter_id, PaintingLine line, ArrayList<Integer> cells, boolean is_cur_move) {
+    void sendUpdateGameStatus(int painterId, PaintingLine line, ArrayList<Integer> cells, boolean isCurMove) {
         try {
-            oos.writeObject(new UpdateGameStatusMsg(painter_id, line, cells, is_cur_move));
+            oos.writeObject(new UpdateGameStatusMsg(painterId, line, cells, isCurMove));
         }
         catch (IOException e) {
             System.out.println("Failed to send update field! port - " + getPort());
         }
     }
 
-    void sendFinishResult(int painter_id, PaintingLine line, ArrayList<Integer> cells,
-                          ArrayList<Integer> score, boolean is_winner) {
+    void sendFinishResult(int painterId, PaintingLine line, ArrayList<Integer> cells,
+                          ArrayList<Integer> score, boolean isWinner) {
         try {
-            oos.writeObject(new FinishGameMsg(painter_id, line, cells, score, is_winner));
+            oos.writeObject(new FinishGameMsg(painterId, isWinner, line, cells, score));
             oos.reset();
         }
         catch (IOException e) {

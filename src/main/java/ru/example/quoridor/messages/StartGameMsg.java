@@ -1,21 +1,15 @@
 package ru.example.quoridor.messages;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.io.Serializable;
 
+@Getter
+@AllArgsConstructor
 public class StartGameMsg implements Serializable {
-    boolean is_cur_move;
-    int num_players;
 
-    public StartGameMsg(boolean is_cur_move_, int num_players_) {
-        is_cur_move = is_cur_move_;
-        num_players = num_players_;
-    }
+    private boolean isCurMove;
+    private int numPlayers;
 
-    public boolean isCurMove() {
-        return is_cur_move;
-    }
-
-    public int getNumPlayers() {
-        return num_players;
-    }
 }

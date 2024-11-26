@@ -1,21 +1,17 @@
 package ru.example.quoridor.client;
 
+import lombok.Setter;
 import ru.example.quoridor.messages.FinishGameMsg;
 import ru.example.quoridor.messages.LineType;
 import ru.example.quoridor.messages.StartGameMsg;
 import ru.example.quoridor.messages.UpdateGameStatusMsg;
 
+@Setter
 public class ClientManager {
-    VisualController controller;
-    SocketClient socket;
 
-    public void setController(VisualController controller) {
-        this.controller = controller;
-    }
+    private VisualController controller;
 
-    public void setSocket(SocketClient socket) {
-        this.socket = socket;
-    }
+    private SocketClient socket;
 
     public void sendReady() {
         socket.sendReady();
@@ -30,10 +26,11 @@ public class ClientManager {
     }
 
     public void updateGameStatus(UpdateGameStatusMsg msg) {
-        controller.UpdateGameStatus(msg);
+        controller.updateGameStatus(msg);
     }
 
     public void sendLine(int id, LineType type) {
         socket.sendLine(id, type);
     }
+
 }

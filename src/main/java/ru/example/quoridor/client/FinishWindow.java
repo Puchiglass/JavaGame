@@ -12,14 +12,16 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 
 public class FinishWindow {
-    ClientManager manager = BClientManager.getManager();
-    Stage window;
-    boolean is_winner;
-    ArrayList<Integer> score;
-    Label info;
 
-    FinishWindow(boolean is_winner, ArrayList<Integer> score) {
-        this.is_winner = is_winner;
+    private final ClientManager manager = BClientManager.getManager();
+    private final boolean isWinner;
+    private final ArrayList<Integer> score;
+
+    private Stage window;
+    private Label info;
+
+    FinishWindow(boolean isWinner, ArrayList<Integer> score) {
+        this.isWinner = isWinner;
         this.score = score;
     }
 
@@ -33,27 +35,27 @@ public class FinishWindow {
         window.setResizable(false);
         window.setTitle("Результат");
 
-        Label result_label = new Label();
-        if (is_winner) {
-            result_label.setText("Победа!!!");
+        Label resultLabel = new Label();
+        if (isWinner) {
+            resultLabel.setText("Победа!!!");
         }
         else {
-            result_label.setText("Поражение(");
+            resultLabel.setText("Поражение(");
         }
-        result_label.setFont(Font.font(40));
-        vBox.getChildren().add(result_label);
+        resultLabel.setFont(Font.font(40));
+        vBox.getChildren().add(resultLabel);
 
         for (int i = 0; i < score.size(); i++) {
-            Label player_result = new Label("Player" + (i + 1) + " - " + score.get(i));
-            player_result.setFont(Font.font(20));
-            vBox.getChildren().add(player_result);
+            Label playerResult = new Label("Player" + (i + 1) + " - " + score.get(i));
+            playerResult.setFont(Font.font(20));
+            vBox.getChildren().add(playerResult);
         }
 
         info = new Label("Нажмите \"Рестарт\", чтобы сыграть еще раз");
         vBox.getChildren().add(info);
-        Button restart_game_btn = new Button("Рестарт");
-        restart_game_btn.setOnAction(event-> restartGame());
-        vBox.getChildren().add(restart_game_btn);
+        Button restartGameBtn = new Button("Рестарт");
+        restartGameBtn.setOnAction(event-> restartGame());
+        vBox.getChildren().add(restartGameBtn);
 
         window.showAndWait();
     }
@@ -65,4 +67,5 @@ public class FinishWindow {
         manager.sendReady();
         info.setText("Ожидание второго игрока");
     }
+
 }

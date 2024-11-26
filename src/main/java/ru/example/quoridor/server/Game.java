@@ -1,5 +1,6 @@
 package ru.example.quoridor.server;
 
+import lombok.Getter;
 import ru.example.quoridor.messages.LineType;
 import ru.example.quoridor.messages.PaintingLine;
 
@@ -7,104 +8,100 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Game {
-    ServerManager manager;
-    static final int field_size = 3;
-    static final int total_cells = field_size * field_size;
-    int num_colored_cells = 0;
-    int cur_move_id = 0;
-    int[] cells = new int[field_size * field_size];
-    boolean[] vertical_lines = new boolean[field_size * (field_size + 1)];
-    boolean[] horizontal_lines = new boolean[field_size * (field_size + 1)];
-    ArrayList<Integer> player_score;
-    Game(ServerManager manager_) {
-        manager = manager_;
-        player_score = new ArrayList<>();
+    private static final int FIELD_SIZE = 3;
+    private static final int TOTAL_CELLS = FIELD_SIZE * FIELD_SIZE;
+
+    @Getter
+    private final ArrayList<Integer> playerScore;
+    private final boolean[] verticalLines = new boolean[FIELD_SIZE * (FIELD_SIZE + 1)];
+    private final boolean[] horizontalLines = new boolean[FIELD_SIZE * (FIELD_SIZE + 1)];
+    private final int[] cells = new int[FIELD_SIZE * FIELD_SIZE];
+
+    private int numColoredCells = 0;
+    @Getter
+    private int curMoveId = 0;
+
+    public Game() {
+        playerScore = new ArrayList<>();
     }
 
-    int addNewPlayer() {
-        player_score.add(0);
-        return player_score.size() - 1;
+    public int addNewPlayer() {
+        playerScore.add(0);
+        return playerScore.size() - 1;
     }
 
     public void reset() {
-        cur_move_id = 0;
-        num_colored_cells = 0;
-        Arrays.fill(vertical_lines, false);
-        Arrays.fill(horizontal_lines, false);
+        curMoveId = 0;
+        numColoredCells = 0;
+        Arrays.fill(verticalLines, false);
+        Arrays.fill(horizontalLines, false);
         Arrays.fill(cells, 0);
-        player_score.replaceAll(ignored -> 0);
+        playerScore.replaceAll(ignored -> 0);
 
     }
 
-    PaintLineResult paintLine(int player_id, PaintingLine line) {
-        if (line.index < 0 || line.index >= vertical_lines.length ||
-                (line.type == LineType.VERTICAL && vertical_lines[line.index]) ||
-                (line.type == LineType.HORIZONTAL && horizontal_lines[line.index])) {
+    public PaintLineResult paintLine(int playerId, PaintingLine line) {
+        if (line.index < 0 || line.index >= verticalLines.length ||
+                (line.type == LineType.VERTICAL && verticalLines[line.index]) ||
+                (line.type == LineType.HORIZONTAL && horizontalLines[line.index])) {
             return new PaintLineResult(PaintLineResultType.INVALID_LINE);
         }
-        if (player_id < 0 || player_id >= player_score.size() || player_id != cur_move_id) {
+        if (playerId < 0 || playerId >= playerScore.size() || playerId != curMoveId) {
             return new PaintLineResult(PaintLineResultType.INVALID_PLAYER);
         }
 
         if (line.type == LineType.VERTICAL) {
-            vertical_lines[line.index] = true;
+            verticalLines[line.index] = true;
         }
         else {
-            horizontal_lines[line.index] = true;
+            horizontalLines[line.index] = true;
         }
 
-        ArrayList<Integer> colored_cells = new ArrayList<>();
+        ArrayList<Integer> coloredCells = new ArrayList<>();
         if (line.type == LineType.HORIZONTAL) {
             if (line.index < cells.length && ++cells[line.index] == 4) {
-                colorCell(line.index, player_id, colored_cells);
+                colorCell(line.index, playerId, coloredCells);
             }
 
-            if (line.index - field_size >= 0 && ++cells[line.index - field_size] == 4) {
-                colorCell(line.index - 3, player_id, colored_cells);
+            if (line.index - FIELD_SIZE >= 0 && ++cells[line.index - FIELD_SIZE] == 4) {
+                colorCell(line.index - 3, playerId, coloredCells);
             }
         }
         else {
             if (line.index % 4 == 0) {
                 if (++cells[line.index / 4 * 3] == 4) {
-                    colorCell(line.index / 4 * 3, player_id, colored_cells);
+                    colorCell(line.index / 4 * 3, playerId, coloredCells);
                 }
             }
             else if (line.index % 4 == 3) {
                 if (++cells[line.index - 1 - line.index / 4] == 4) {
-                    colorCell(line.index - 1 - line.index / 4, player_id, colored_cells);
+                    colorCell(line.index - 1 - line.index / 4, playerId, coloredCells);
                 }
             }
             else {
                 if (++cells[line.index - line.index / 4] == 4) {
-                    colorCell(line.index - line.index / 4, player_id, colored_cells);
+                    colorCell(line.index - line.index / 4, playerId, coloredCells);
                 }
                 if (++cells[line.index - 1 - line.index / 4] == 4) {
-                    colorCell(line.index - 1 - line.index / 4, player_id, colored_cells);
+                    colorCell(line.index - 1 - line.index / 4, playerId, coloredCells);
                 }
             }
         }
 
-        if (colored_cells.isEmpty()) {
-            cur_move_id = (cur_move_id + 1) % player_score.size();
+        if (coloredCells.isEmpty()) {
+            curMoveId = (curMoveId + 1) % playerScore.size();
         }
 
-        if (num_colored_cells == total_cells) {
-            return new PaintLineResult(PaintLineResultType.FINISH, colored_cells);
+        if (numColoredCells == TOTAL_CELLS) {
+            return new PaintLineResult(PaintLineResultType.FINISH, coloredCells);
         }
-        return new PaintLineResult(PaintLineResultType.NEW_COLORED_CELLS, colored_cells);
+        return new PaintLineResult(PaintLineResultType.NEW_COLORED_CELLS, coloredCells);
     }
 
-    private void colorCell(int cell_ind, int player_id, ArrayList<Integer> colored_cells) {
-        colored_cells.add(cell_ind);
-        player_score.set(player_id, player_score.get(player_id) + 1);
-        num_colored_cells++;
+    private void colorCell(int cellInd, int playerId, ArrayList<Integer> coloredCells) {
+        coloredCells.add(cellInd);
+        playerScore.set(playerId, playerScore.get(playerId) + 1);
+        numColoredCells++;
     }
 
-    ArrayList<Integer> getPlayerScore() {
-        return player_score;
-    }
-
-    public int getCurMoveId() {
-        return cur_move_id;
-    }
 }

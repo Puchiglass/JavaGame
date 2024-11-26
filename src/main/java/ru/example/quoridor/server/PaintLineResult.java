@@ -1,18 +1,17 @@
 package ru.example.quoridor.server;
 
+import lombok.AllArgsConstructor;
+
 import java.util.ArrayList;
 
+@AllArgsConstructor
 public class PaintLineResult {
+
     public PaintLineResultType type;
-    public ArrayList<Integer> colored_cells;
+    public ArrayList<Integer> colored_cells = new ArrayList<>();
 
     PaintLineResult(PaintLineResultType type_) {
         type = type_;
-        colored_cells = new ArrayList<>();
     }
 
-    PaintLineResult(PaintLineResultType type_, ArrayList<Integer> colored_cells_) {
-        type = type_;
-        colored_cells = colored_cells_;
-    }
 }
