@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+
+<Pane fx:id="main_pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.corridor_game.corridor_game.client.VisualController">
+   <children>
+      <VBox fx:id="stat_field" layoutX="420.0" layoutY="85.0" prefHeight="300.0" prefWidth="140.0" />
+   </children>
+</Pane>
