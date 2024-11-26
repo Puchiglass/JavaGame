@@ -1,9 +1,9 @@
-module org.corridor_game.corridor_game.client {
+module ru.example.quoridor.client {
     requires javafx.controls;
     requires javafx.fxml;
 
 
-    opens org.corridor_game.corridor_game.client to javafx.fxml;
-    exports org.corridor_game.corridor_game.client;
-    exports org.corridor_game.corridor_game.messages;
+    opens ru.example.quoridor.client to javafx.fxml;
+    exports ru.example.quoridor.client;
+    exports ru.example.quoridor.messages;
 }

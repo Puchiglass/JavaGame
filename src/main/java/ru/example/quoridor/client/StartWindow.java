@@ -1,4 +1,4 @@
-package org.corridor_game.corridor_game.client;
+package ru.example.quoridor.client;
 
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

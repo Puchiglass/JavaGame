@@ -1,4 +1,4 @@
-package org.corridor_game.corridor_game.server;
+package ru.example.quoridor.server;
 
 public class Main {
     public static void main(String[] args) {

@@ -1,11 +1,9 @@
-package org.corridor_game.corridor_game.client;
+package ru.example.quoridor.client;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-
 
 public class Main extends Application {
     @Override

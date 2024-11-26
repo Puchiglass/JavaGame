@@ -1,9 +1,9 @@
-package org.corridor_game.corridor_game.client;
+package ru.example.quoridor.client;
 
-import org.corridor_game.corridor_game.messages.FinishGameMsg;
-import org.corridor_game.corridor_game.messages.LineType;
-import org.corridor_game.corridor_game.messages.StartGameMsg;
-import org.corridor_game.corridor_game.messages.UpdateGameStatusMsg;
+import ru.example.quoridor.messages.FinishGameMsg;
+import ru.example.quoridor.messages.LineType;
+import ru.example.quoridor.messages.StartGameMsg;
+import ru.example.quoridor.messages.UpdateGameStatusMsg;
 
 public class ClientManager {
     VisualController controller;

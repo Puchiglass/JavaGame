@@ -1,4 +1,4 @@
-package org.corridor_game.corridor_game.client;
+package ru.example.quoridor.client;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -11,7 +11,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import org.corridor_game.corridor_game.messages.*;
+import ru.example.quoridor.messages.*;
 
 import java.util.ArrayList;
 

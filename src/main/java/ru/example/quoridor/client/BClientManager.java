@@ -1,4 +1,4 @@
-package org.corridor_game.corridor_game.client;
+package ru.example.quoridor.client;
 
 public class BClientManager {
     static final ClientManager manager = new ClientManager();

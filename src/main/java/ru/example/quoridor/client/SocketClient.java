@@ -1,6 +1,6 @@
-package org.corridor_game.corridor_game.client;
+package ru.example.quoridor.client;
 
-import org.corridor_game.corridor_game.messages.*;
+import ru.example.quoridor.messages.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

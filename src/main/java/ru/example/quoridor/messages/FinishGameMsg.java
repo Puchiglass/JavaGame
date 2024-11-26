@@ -1,4 +1,4 @@
-package org.corridor_game.corridor_game.messages;
+package ru.example.quoridor.messages;
 
 import java.io.Serializable;
 import java.util.ArrayList;

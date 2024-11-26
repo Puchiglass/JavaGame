@@ -1,8 +1,10 @@
-package org.corridor_game.corridor_game.server;
+package ru.example.quoridor.server;
 
-import org.corridor_game.corridor_game.messages.*;
+import ru.example.quoridor.messages.*;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 

@@ -1,6 +1,6 @@
-package org.corridor_game.corridor_game.server;
+package ru.example.quoridor.server;
 
-import org.corridor_game.corridor_game.messages.PaintingLine;
+import ru.example.quoridor.messages.PaintingLine;
 
 import java.util.ArrayList;
 

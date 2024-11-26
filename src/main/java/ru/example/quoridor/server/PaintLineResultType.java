@@ -1,4 +1,4 @@
-package org.corridor_game.corridor_game.server;
+package ru.example.quoridor.server;
 
 public enum PaintLineResultType {
     INVALID_LINE,
