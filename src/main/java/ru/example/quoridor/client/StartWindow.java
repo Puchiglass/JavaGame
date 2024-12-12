@@ -36,7 +36,7 @@ public class StartWindow {
 
     void readyAction() {
         info.setText("Ожидание готовности второго игрока");
-        manager.sendReady();
+        manager.ready();
     }
 
     public void close() {

@@ -3,31 +3,39 @@ package ru.example.quoridor.server;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import ru.example.quoridor.messages.PaintingLine;
+import lombok.experimental.Accessors;
+import ru.example.quoridor.messages.PlayersMove;
 
-import java.util.ArrayList;
+import java.util.List;
 
+@Getter
+@Setter
+@Accessors(chain = true)
 @RequiredArgsConstructor
 public class Player {
 
-    private final ClientConnection connection;
-    private final int id;
+    private ClientConnection connection;
+    private int id;
+    private int score = 0;
 
-    @Setter
-    @Getter
+    public Player(int id, ClientConnection connection) {
+        this.id = id;
+        this.connection = connection;
+    }
+
     private boolean isReady = false;
 
     public void startGame(int curMoveId, int numPlayers) {
-        connection.sendStartGame(curMoveId == id, numPlayers);
+        connection.startGame(curMoveId == this.id, numPlayers);
     }
 
-    public void updateGameStatus(int painterId, PaintingLine line, ArrayList<Integer> cells, int curMoveId) {
-        connection.sendUpdateGameStatus(painterId, line, cells, curMoveId == id);
+    public void updateGameStatus(int painterId, PlayersMove move, List<Integer> cells, int curMoveId) {
+        connection.sendUpdateGameStatus(painterId, move, cells, curMoveId == id);
     }
 
-    public void giveFinishResult(int painterId, PaintingLine line, ArrayList<Integer> cells,
-                                 ArrayList<Integer> score, int winnerId) {
-        connection.sendFinishResult(painterId, line, cells, score, winnerId == id);
+    public void giveFinishResult(int painterId, PlayersMove move, List<Integer> cells,
+                                 List<Integer> score, int winnerId) {
+        connection.sendFinishResult(painterId, move, cells, score, winnerId == id);
     }
 
 }

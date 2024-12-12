@@ -1,9 +1,9 @@
 package ru.example.quoridor.server;
 
-public class Main {
+public class CorridorServer {
 
     public static void main(String[] args) {
-        ServerManager manager = new ServerManager();
+        GameManager manager = new GameManager();
         manager.runServer();
     }
 

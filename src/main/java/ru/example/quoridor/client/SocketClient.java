@@ -19,38 +19,41 @@ public class SocketClient {
     private final ClientManager manager = BClientManager.getManager();
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
+    private Socket socket;
 
     public SocketClient() {
         try {
             InetAddress ip = InetAddress.getLocalHost();
-            Socket socket = new Socket(ip, PORT);
+            socket = new Socket(ip, PORT);
             ois = new ObjectInputStream(socket.getInputStream());
             oos = new ObjectOutputStream(socket.getOutputStream());
-        }
-        catch (IOException e) {
-            log.error("Failed to connect to the server");
+        } catch (IOException e) {
+            log.error("Failed to connect to the server", e);
+            closeResources();
             return;
         }
         Thread thread = new Thread(this::run);
         thread.setDaemon(true);
         thread.start();
-        log.info("Client start");
+        log.info("Client started");
     }
 
     void run() {
         while (true) {
             try {
                 Object obj = ois.readObject();
-                if (obj instanceof StartGameMsg msg) {
-                    log.info("Start message");
+                if (obj instanceof Start msg) {
+                    System.out.println("Start message");
                     manager.startGame(msg);
                 }
-                else if (obj instanceof UpdateGameStatusMsg msg) {
-                    log.info("Update message");
+                if (obj instanceof Update msg) {
+                    System.out.println("Update message");
                     manager.updateGameStatus(msg);
                 }
-                else if (obj instanceof FinishGameMsg msg) {
-                    log.info("Finish message");
+                if (obj instanceof Finish finish) {
+                    manager.finishGame(finish);
+                } else if (obj instanceof FinishGameMsg msg) {
+                    System.out.println("Finish message");
                     manager.finishGame(msg);
                 }
             }
@@ -60,6 +63,14 @@ public class SocketClient {
             catch (ClassNotFoundException e) {
                 log.error(e.getMessage());
             }
+        }
+    }
+
+    public void sendReady(Ready ready) {
+        try {
+            oos.writeObject(ready);
+        } catch (IOException e) {
+            log.error("Failed to send ready message", e);
         }
     }
 
@@ -74,10 +85,20 @@ public class SocketClient {
 
     public void sendLine(int id, LineType type) {
         try {
-            oos.writeObject(new PaintingLine(type, id));
+            oos.writeObject(new PlayersMove(type, id));
         }
         catch (IOException e) {
             log.error("Failed to send line message");
+        }
+    }
+
+    private void closeResources() {
+        try {
+            if (ois != null) ois.close();
+            if (oos != null) oos.close();
+            if (socket != null) socket.close();
+        } catch (IOException e) {
+            log.error("Failed to close resources", e);
         }
     }
 }

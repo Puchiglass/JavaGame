@@ -13,7 +13,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import ru.example.quoridor.messages.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class Controller {
     private static final int FIELD_SIZE = 3;
@@ -42,7 +42,6 @@ public class Controller {
         initializeLines();
         initializeCells();
         initializeCurMoveLabel();
-//        initializeStatField();
         showStartWindow();
     }
 
@@ -113,10 +112,10 @@ public class Controller {
         }
     }
 
-    public void startGame(StartGameMsg msg) {
+    public void startGame(Start msg) {
         Platform.runLater(() -> {
             setCurMove(msg.isCurMove());
-            fillStatField(msg.getNumPlayers());
+            fillStatField(msg.numPlayers());
             if (finishWindow != null) {
                 reset();
                 finishWindow.close();
@@ -129,15 +128,15 @@ public class Controller {
 
     public void finishGame(FinishGameMsg msg) {
         Platform.runLater(() -> {
-            updateField(msg.painterId(), msg.line(), msg.cells());
+            updateField(msg.painterId(), msg.move(), msg.cells());
             finishWindow = new FinishWindow(msg.isWinner(), msg.score());
             finishWindow.show();
         });
     }
 
-    public void updateGameStatus(UpdateGameStatusMsg msg) {
+    public void updateGameStatus(Update msg) {
         Platform.runLater(() -> {
-            updateField(msg.getPainterId(), msg.getLine(), msg.getCells());
+            updateField(msg.painterId(), msg.move(), msg.cells());
             setCurMove(msg.isCurMove());
         });
     }
@@ -159,13 +158,13 @@ public class Controller {
         }
     }
 
-    private void updateField(int painterId, PaintingLine line, ArrayList<Integer> coloredCells) {
-        if (line.type() == LineType.HORIZONTAL) {
-            horizontalLines[line.index()].setStroke(COLORS_FOR_PLAYERS[painterId]);
-            horizontalLines[line.index()].toFront();
+    private void updateField(int painterId, PlayersMove move, List<Integer> coloredCells) {
+        if (move.type() == LineType.HORIZONTAL) {
+            horizontalLines[move.id()].setStroke(COLORS_FOR_PLAYERS[painterId]);
+            horizontalLines[move.id()].toFront();
         } else {
-            verticalLines[line.index()].setStroke(COLORS_FOR_PLAYERS[painterId]);
-            verticalLines[line.index()].toFront();
+            verticalLines[move.id()].setStroke(COLORS_FOR_PLAYERS[painterId]);
+            verticalLines[move.id()].toFront();
         }
 
         for (int cellId : coloredCells) {

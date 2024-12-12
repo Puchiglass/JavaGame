@@ -2,25 +2,26 @@ package ru.example.quoridor.server;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.example.quoridor.client.Finish;
 import ru.example.quoridor.messages.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.List;
 
 public class ClientConnection {
 
     private static final Logger log = LogManager.getLogger(ClientConnection.class);
 
     private final Socket socket;
-    private final ServerManager manager;
+    private final GameManager manager;
 
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
 
-    public ClientConnection(Socket socket, ServerManager manager) {
+    public ClientConnection(Socket socket, GameManager manager) {
         this.socket = socket;
         this.manager = manager;
         try {
@@ -43,13 +44,11 @@ public class ClientConnection {
         while (true) {
             try {
                 Object obj = ois.readObject();
-                if (obj instanceof SignalMsg msg) {
-                    if (msg == SignalMsg.READY) {
-                        manager.processReadyMsg(getPort());
-                    }
+                if (obj instanceof Ready) {
+                    manager.processReadyMsg(getPort());
                 }
-                else if (obj instanceof PaintingLine line) {
-                    manager.processPaintLineMsg(getPort(), line);
+                if (obj instanceof PlayersMove move) {
+                    manager.processPlayersMove(move, getPort());
                 }
             }
             catch (IOException e) {
@@ -62,28 +61,28 @@ public class ClientConnection {
         }
     }
 
-    void sendStartGame(boolean isCurMove, int numPlayers) {
+    void startGame(boolean isCurMove, int numPlayers) {
         try {
-            oos.writeObject(new StartGameMsg(isCurMove, numPlayers));
+            oos.writeObject(new Start(isCurMove, numPlayers));
         }
         catch (IOException e) {
             log.error("Failed to send the start message on port - %d".formatted(getPort()));
         }
     }
 
-    void sendUpdateGameStatus(int painterId, PaintingLine line, ArrayList<Integer> cells, boolean isCurMove) {
+    void sendUpdateGameStatus(int painterId, PlayersMove move, List<Integer> cells, boolean isCurMove) {
         try {
-            oos.writeObject(new UpdateGameStatusMsg(painterId, line, cells, isCurMove));
+            oos.writeObject(new Update(painterId, move, cells, isCurMove));
         }
         catch (IOException e) {
             log.error("Failed to send update field on port - %d".formatted(getPort()));
         }
     }
 
-    void sendFinishResult(int painterId, PaintingLine line, ArrayList<Integer> cells,
-                          ArrayList<Integer> score, boolean isWinner) {
+    void sendFinishResult(int painterId, PlayersMove move, List<Integer> cells,
+                          List<Integer> score, boolean isWinner) {
         try {
-            oos.writeObject(new FinishGameMsg(painterId, isWinner, line, cells, score));
+            oos.writeObject(new Finish(painterId, isWinner, move, cells, score));
             oos.reset();
         }
         catch (IOException e) {

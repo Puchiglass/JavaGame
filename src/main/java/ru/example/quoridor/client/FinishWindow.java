@@ -10,17 +10,18 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FinishWindow {
 
     private final ClientManager manager = BClientManager.getManager();
     private final boolean isWinner;
-    private final ArrayList<Integer> score;
+    private final List<Integer> score;
 
     private Stage window;
     private Label info;
 
-    FinishWindow(boolean isWinner, ArrayList<Integer> score) {
+    FinishWindow(boolean isWinner, List<Integer> score) {
         this.isWinner = isWinner;
         this.score = score;
     }
@@ -64,7 +65,7 @@ public class FinishWindow {
         window.close();
     }
     void restartGame() {
-        manager.sendReady();
+        manager.ready();
         info.setText("Ожидание второго игрока");
     }
 

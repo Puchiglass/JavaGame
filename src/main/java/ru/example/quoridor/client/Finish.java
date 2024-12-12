@@ -1,10 +1,11 @@
-package ru.example.quoridor.messages;
+package ru.example.quoridor.client;
+
+import ru.example.quoridor.messages.PlayersMove;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
-public record FinishGameMsg(
+public record Finish(
         int painterId,
         boolean isWinner,
         PlayersMove move,

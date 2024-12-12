@@ -16,20 +16,21 @@ public class SocketServer {
 
     private static final Logger log = LogManager.getLogger(SocketServer.class);
 
-    private final ServerManager manager;
+    private final GameManager manager;
 
     public void waitNewPlayers() {
         try {
             InetAddress ip = InetAddress.getLocalHost();
             ServerSocket ss = new ServerSocket(PORT, 0, ip);
             Socket cs;
+            System.out.printf("Server started on port %d%n", PORT);
             while (true) {
                 cs = ss.accept();
-                if (manager.getPlayers().size() == 2) {
+                if (!manager.canBeAddedPlayer()) {
                     cs.close();
                     continue;
                 }
-                log.info("New client on port %d".formatted(cs.getPort()));
+                System.out.printf("New client on port %d%n", cs.getPort());
                 ClientConnection cc = new ClientConnection(cs, manager);
                 manager.addNewPlayer(cc);
             }
