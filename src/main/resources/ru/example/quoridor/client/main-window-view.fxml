@@ -4,6 +4,6 @@
 
 <Pane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
       prefHeight="450.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.example.quoridor.client.VisualController">
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.example.quoridor.client.Controller">
    <VBox fx:id="statField" layoutX="420.0" layoutY="85.0" prefHeight="300.0" prefWidth="140.0"/>
 </Pane>

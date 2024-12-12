@@ -15,7 +15,7 @@ import ru.example.quoridor.messages.*;
 
 import java.util.ArrayList;
 
-public class VisualController {
+public class Controller {
     private static final int FIELD_SIZE = 3;
     private static final int CELL_PIXEL_SIZE = 100;
     private static final int START_FIELD_X = 50;
@@ -39,55 +39,74 @@ public class VisualController {
     @FXML
     public void initialize() {
         manager.setController(this);
-        Line line;
+        initializeLines();
+        initializeCells();
+        initializeCurMoveLabel();
+//        initializeStatField();
+        showStartWindow();
+    }
+
+    private void initializeLines() {
         for (int i = 0; i < verticalLines.length; i++) {
-            line = new Line(0, 0, CELL_PIXEL_SIZE, 0);
-            line.setStrokeWidth(8);
-            line.setId(String.valueOf(i));
-            line.setStroke(Color.GREY);
-            line.setOnMouseClicked(event -> sendLine(event, LineType.HORIZONTAL));
-            line.setLayoutX(START_FIELD_X + i % FIELD_SIZE * CELL_PIXEL_SIZE);
-            line.setLayoutY(START_FIELD_Y + i / FIELD_SIZE * CELL_PIXEL_SIZE);
-            mainPane.getChildren().add(line);
-            horizontalLines[i] = line;
+            Line horizontalLine = createLine(CELL_PIXEL_SIZE, 0, i, LineType.HORIZONTAL);
+            horizontalLines[i] = horizontalLine;
+            mainPane.getChildren().add(horizontalLine);
 
-            line = new Line(0, 0, 0, CELL_PIXEL_SIZE);
-            line.setStrokeWidth(8);
-            line.setId(String.valueOf(i));
-            line.setStroke(Color.GREY);
-            line.setOnMouseClicked(event -> sendLine(event, LineType.VERTICAL));
-            line.setLayoutX(START_FIELD_X + i % (FIELD_SIZE + 1) * CELL_PIXEL_SIZE);
-            line.setLayoutY(START_FIELD_Y + i / (FIELD_SIZE + 1) * CELL_PIXEL_SIZE);
-            mainPane.getChildren().add(line);
-            verticalLines[i] = line;
+            Line verticalLine = createLine(0, CELL_PIXEL_SIZE, i, LineType.VERTICAL);
+            verticalLines[i] = verticalLine;
+            mainPane.getChildren().add(verticalLine);
         }
+    }
 
+    private Line createLine(double endX, double endY, int id, LineType type) {
+        Line line = new Line(0, 0, endX, endY);
+        line.setStrokeWidth(8);
+        line.setId(String.valueOf(id));
+        line.setStroke(Color.BLACK);
+        line.setOnMouseClicked(event -> sendLine(event, type));
+        if (type == LineType.HORIZONTAL) {
+            line.setLayoutX(START_FIELD_X + id % FIELD_SIZE * CELL_PIXEL_SIZE);
+            line.setLayoutY(START_FIELD_Y + id / FIELD_SIZE * CELL_PIXEL_SIZE);
+        } else {
+            line.setLayoutX(START_FIELD_X + id % (FIELD_SIZE + 1) * CELL_PIXEL_SIZE);
+            line.setLayoutY(START_FIELD_Y + id / (FIELD_SIZE + 1) * CELL_PIXEL_SIZE);
+        }
+        return line;
+    }
+
+    private void initializeCells() {
         for (int i = 0; i < cells.length; i++) {
-            Rectangle rec = new Rectangle(CELL_PIXEL_SIZE - 8, CELL_PIXEL_SIZE - 8);
-            rec.setLayoutX(START_FIELD_X + 4 + i % FIELD_SIZE * CELL_PIXEL_SIZE);
-            rec.setLayoutY(START_FIELD_Y + 4 + (i / FIELD_SIZE) * CELL_PIXEL_SIZE);
-            rec.setFill(Color.WHITE);
-            rec.setOpacity(0.5);
-            rec.setStrokeWidth(0);
-            mainPane.getChildren().add(rec);
-            cells[i] = rec;
+            Rectangle cell = new Rectangle(CELL_PIXEL_SIZE - 8, CELL_PIXEL_SIZE - 8);
+            cell.setLayoutX(START_FIELD_X + 4 + i % FIELD_SIZE * CELL_PIXEL_SIZE);
+            cell.setLayoutY(START_FIELD_Y + 4 + (i / FIELD_SIZE) * CELL_PIXEL_SIZE);
+            cell.setFill(Color.WHITE);
+            cell.setOpacity(0.5);
+            cell.setStrokeWidth(0);
+            mainPane.getChildren().add(cell);
+            cells[i] = cell;
         }
+    }
 
+    private void initializeCurMoveLabel() {
         curMoveLabel = new Label();
         curMoveLabel.setLayoutX(150);
         curMoveLabel.setLayoutY(50);
         curMoveLabel.setFont(Font.font(20));
         mainPane.getChildren().add(curMoveLabel);
+    }
 
+    private void initializeStatField() {
         statField.setSpacing(50);
         statField.setAlignment(Pos.TOP_CENTER);
+    }
 
+    private void showStartWindow() {
         startWindow = new StartWindow();
         startWindow.show();
     }
 
     private void sendLine(MouseEvent event, LineType type) {
-        Line line = (Line)event.getSource();
+        Line line = (Line) event.getSource();
         if (line.getStroke() == Color.GREY) {
             int id = Integer.parseInt(line.getId());
             manager.sendLine(id, type);
@@ -95,15 +114,14 @@ public class VisualController {
     }
 
     public void startGame(StartGameMsg msg) {
-        Platform.runLater(()-> {
+        Platform.runLater(() -> {
             setCurMove(msg.isCurMove());
             fillStatField(msg.getNumPlayers());
             if (finishWindow != null) {
                 reset();
                 finishWindow.close();
                 finishWindow = null;
-            }
-            else {
+            } else {
                 startWindow.close();
             }
         });
@@ -116,12 +134,14 @@ public class VisualController {
             finishWindow.show();
         });
     }
+
     public void updateGameStatus(UpdateGameStatusMsg msg) {
-        Platform.runLater(()-> {
+        Platform.runLater(() -> {
             updateField(msg.getPainterId(), msg.getLine(), msg.getCells());
             setCurMove(msg.isCurMove());
         });
     }
+
     private void fillStatField(int numPlayers) {
         for (int i = statField.getChildren().size(); i < numPlayers; i++) {
             Label player_label = new Label("Player" + (i + 1));
@@ -134,8 +154,7 @@ public class VisualController {
     private void setCurMove(boolean isCurMove) {
         if (isCurMove) {
             curMoveLabel.setText("Твой Ход!");
-        }
-        else {
+        } else {
             curMoveLabel.setText("Ход Противника!");
         }
     }
@@ -144,8 +163,7 @@ public class VisualController {
         if (line.type() == LineType.HORIZONTAL) {
             horizontalLines[line.index()].setStroke(COLORS_FOR_PLAYERS[painterId]);
             horizontalLines[line.index()].toFront();
-        }
-        else {
+        } else {
             verticalLines[line.index()].setStroke(COLORS_FOR_PLAYERS[painterId]);
             verticalLines[line.index()].toFront();
         }

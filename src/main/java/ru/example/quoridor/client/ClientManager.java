@@ -9,7 +9,7 @@ import ru.example.quoridor.messages.UpdateGameStatusMsg;
 @Setter
 public class ClientManager {
 
-    private VisualController controller;
+    private Controller controller;
 
     private SocketClient socket;
 
