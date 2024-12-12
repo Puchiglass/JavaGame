@@ -1,10 +1,9 @@
-package ru.example.quoridor.messages;
+package ru.example.quoridor.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
-public record FinishGameMsg(
+public record Finish(
         int painterId,
         boolean isWinner,
         PlayersMove move,

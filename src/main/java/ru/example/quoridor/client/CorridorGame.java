@@ -9,35 +9,31 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import ru.example.quoridor.messages.LineType;
-import ru.example.quoridor.messages.PlayersMove;
-import ru.example.quoridor.messages.Start;
-import ru.example.quoridor.messages.Update;
+import ru.example.quoridor.model.*;
 
 import java.util.List;
 
+import static ru.example.quoridor.property.Property.*;
+
 public class CorridorGame extends Application {
-    private static final int FIELD_SIZE = 3;
-    private static final int CELL_PIXEL_SIZE = 100;
-    private static final int START_FIELD_X = 50;
-    private static final int START_FIELD_Y = 100;
 
-    private final ClientManager manager = BClientManager.getManager();
-
+    private final ClientManager manager = ClientManager.getInstance();
+    private final Pane root = new Pane();
     private final Line[] verticalLines = new Line[(FIELD_SIZE + 1) * FIELD_SIZE];
     private final Line[] horizontalLines = new Line[(FIELD_SIZE + 1) * FIELD_SIZE];
-    private final Rectangle[] cells = new Rectangle[FIELD_SIZE * FIELD_SIZE];
     private final Text[] cellTexts = new Text[FIELD_SIZE * FIELD_SIZE];
-    private boolean isPlayerMove = false;
 
-    private final Pane root = new Pane();
+    private boolean isPlayerMove = false;
     private Button startButton;
     private Label moveLabel;
 
+    /**
+     * Start the app
+     * @param primaryStage
+     */
     @Override
     public void start(Stage primaryStage) {
         initializeSocket();
@@ -52,12 +48,18 @@ public class CorridorGame extends Application {
         primaryStage.show();
     }
 
+    /**
+     * Start the game
+     * @param msg
+     */
     public void start(Start msg) {
-        Platform.runLater(() -> {
-            updateMoveLabel(msg.isCurMove());
-        });
+        Platform.runLater(() -> updateMoveLabel(msg.isCurMove()));
     }
 
+    /**
+     * Update the game
+     * @param msg
+     */
     public void update(Update msg) {
         Platform.runLater(()-> {
             updateField(msg.painterId(), msg.move(), msg.cells());
@@ -65,6 +67,10 @@ public class CorridorGame extends Application {
         });
     }
 
+    /**
+     * Finish the game
+     * @param msg
+     */
     public void finish(Finish msg) {
         Platform.runLater(() -> {
             updateField(msg.painterId(), msg.move(), msg.cells());
@@ -76,7 +82,7 @@ public class CorridorGame extends Application {
         });
     }
 
-    private void updateField(int painterId, PlayersMove move, List<Integer> coloredCells) {
+    private void updateField(int painterId, PlayersMove move, List<Integer> markedCells) {
         switch (move.type()) {
             case HORIZONTAL:
                 horizontalLines[move.id()].setStroke(Color.BLACK);
@@ -87,7 +93,7 @@ public class CorridorGame extends Application {
                 verticalLines[move.id()].toFront();
                 break;
         }
-        coloredCells.forEach(cell_id -> cellTexts[cell_id].setText(painterId == 0 ? "X" : "O"));
+        markedCells.forEach(cell_id -> cellTexts[cell_id].setText(painterId == 0 ? "X" : "O"));
     }
 
     private void updateMoveLabel(boolean isCurMove) {
@@ -103,13 +109,34 @@ public class CorridorGame extends Application {
         }
     }
 
+
+    // ========================== Events ==========================
+
+    private void sendReady() {
+        manager.ready();
+        Platform.runLater(() -> {
+            moveLabel.setText("Ожидание готовности второго игрока...");
+            root.getChildren().remove(startButton);
+        });
+
+    }
+    private void updateLine(LineType type, MouseEvent event) {
+        Line line = (Line) event.getSource();
+        if (line.getStroke() != Color.LIGHTGRAY || !isPlayerMove) {
+            return;
+        }
+        manager.sendLine(Integer.parseInt(line.getId()), type);
+    }
+
+
+    // ================== Initialization methods ==================
+
     private void initializeSocket() {
         SocketClient socket = new SocketClient();
-        ClientManager manager = BClientManager.getManager();
+        ClientManager manager = ClientManager.getInstance();
         manager.setSocket(socket);
         manager.setCorridorGame(this);
     }
-
     private void initializeMoveLabel() {
         moveLabel = new Label();
         moveLabel.setLayoutX(150);
@@ -128,23 +155,11 @@ public class CorridorGame extends Application {
     }
 
     private void initializeCells() {
-        for (int i = 0; i < cells.length; i++) {
-            Rectangle cell = new Rectangle();
-            cell.setStrokeWidth(0);
-            cell.setOpacity(0.5);
-            cell.setFill(Color.WHITE);
-            cell.setWidth(CELL_PIXEL_SIZE - 8);
-            cell.setHeight(CELL_PIXEL_SIZE - 8);
-            cell.setLayoutX(i % FIELD_SIZE * CELL_PIXEL_SIZE + START_FIELD_X + 4);
-            cell.setLayoutY((i / FIELD_SIZE) * CELL_PIXEL_SIZE + START_FIELD_Y + 4);
-
-            cells[i] = cell;
-            root.getChildren().add(cell);
-
+        for (int i = 0; i < cellTexts.length; i++) {
             Text cellText = new Text();
             cellText.setFont(Font.font(30));
-            cellText.setX(cell.getLayoutX() + CELL_PIXEL_SIZE / 2 - 10);
-            cellText.setY(cell.getLayoutY() + CELL_PIXEL_SIZE / 2 + 10);
+            cellText.setX(i % FIELD_SIZE * CELL_PIXEL_SIZE + START_FIELD_X + 4 + CELL_PIXEL_SIZE / 2 - 10);
+            cellText.setY((i / FIELD_SIZE) * CELL_PIXEL_SIZE + START_FIELD_Y + 4 + CELL_PIXEL_SIZE / 2 + 10);
             cellTexts[i] = cellText;
             root.getChildren().add(cellText);
         }
@@ -161,16 +176,6 @@ public class CorridorGame extends Application {
             root.getChildren().add(verticalLine);
         }
     }
-
-    private void sendReady() {
-        manager.ready();
-        Platform.runLater(() -> {
-            moveLabel.setText("Ожидание готовности второго игрока...");
-            root.getChildren().remove(startButton);
-        });
-
-    }
-
     private Line createLine(double endX, double endY, int id, LineType type) {
         Line line = new Line();
         line.setStartX(0);
@@ -194,15 +199,9 @@ public class CorridorGame extends Application {
         return line;
     }
 
-    private void updateLine(LineType type, MouseEvent event) {
-        Line line = (Line) event.getSource();
-        if (line.getStroke() != Color.LIGHTGRAY || !isPlayerMove) {
-            return;
-        }
-        manager.sendLine(Integer.parseInt(line.getId()), type);
-    }
 
     public static void main(String[] args) {
         launch(args);
     }
+
 }

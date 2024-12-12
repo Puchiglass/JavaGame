@@ -7,5 +7,6 @@ module ru.example.quoridor.client {
 
     opens ru.example.quoridor.client to javafx.fxml;
     exports ru.example.quoridor.client;
-    exports ru.example.quoridor.messages;
+    exports ru.example.quoridor.model;
+    opens ru.example.quoridor.model to javafx.fxml;
 }

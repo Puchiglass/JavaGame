@@ -1,4 +1,4 @@
-package ru.example.quoridor.server;
+package ru.example.quoridor.model;
 
 import lombok.AllArgsConstructor;
 
@@ -9,10 +9,10 @@ import java.util.List;
 public class PaintLineResult {
 
     public PaintLineResultType type;
-    public List<Integer> colored_cells = new ArrayList<>();
+    public List<Integer> markedCells = new ArrayList<>();
 
-    PaintLineResult(PaintLineResultType type_) {
-        type = type_;
+    public PaintLineResult(PaintLineResultType type) {
+        this.type = type;
     }
 
 }

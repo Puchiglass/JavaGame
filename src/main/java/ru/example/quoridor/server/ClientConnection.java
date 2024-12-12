@@ -2,8 +2,8 @@ package ru.example.quoridor.server;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.example.quoridor.client.Finish;
-import ru.example.quoridor.messages.*;
+import ru.example.quoridor.model.Finish;
+import ru.example.quoridor.model.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -40,7 +40,7 @@ public class ClientConnection {
         return socket.getPort();
     }
 
-    void run() {
+    private void run() {
         while (true) {
             try {
                 Object obj = ois.readObject();
@@ -61,16 +61,16 @@ public class ClientConnection {
         }
     }
 
-    void startGame(boolean isCurMove, int numPlayers) {
+    public void startGame(boolean isCurMove) {
         try {
-            oos.writeObject(new Start(isCurMove, numPlayers));
+            oos.writeObject(new Start(isCurMove));
         }
         catch (IOException e) {
             log.error("Failed to send the start message on port - %d".formatted(getPort()));
         }
     }
 
-    void sendUpdateGameStatus(int painterId, PlayersMove move, List<Integer> cells, boolean isCurMove) {
+    public void updateGame(int painterId, PlayersMove move, List<Integer> cells, boolean isCurMove) {
         try {
             oos.writeObject(new Update(painterId, move, cells, isCurMove));
         }
@@ -79,8 +79,8 @@ public class ClientConnection {
         }
     }
 
-    void sendFinishResult(int painterId, PlayersMove move, List<Integer> cells,
-                          List<Integer> score, boolean isWinner) {
+    public void finishGame(int painterId, PlayersMove move, List<Integer> cells,
+                           List<Integer> score, boolean isWinner) {
         try {
             oos.writeObject(new Finish(painterId, isWinner, move, cells, score));
             oos.reset();

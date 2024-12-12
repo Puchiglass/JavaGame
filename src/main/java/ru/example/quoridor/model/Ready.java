@@ -1,4 +1,4 @@
-package ru.example.quoridor.messages;
+package ru.example.quoridor.model;
 
 import java.io.Serializable;
 

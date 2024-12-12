@@ -1,11 +1,8 @@
 package ru.example.quoridor.server;
 
-import lombok.Getter;
-import ru.example.quoridor.messages.PaintingLine;
-import ru.example.quoridor.messages.PlayersMove;
-import ru.example.quoridor.messages.Ready;
+import ru.example.quoridor.model.PaintLineResult;
+import ru.example.quoridor.model.PlayersMove;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,9 +12,6 @@ public class GameManager {
     private final Game game = new Game();
     private final SocketServer socket = new SocketServer(this);
     private final Map<Integer, Player> playerIdByPort = new HashMap<>();
-
-    @Getter
-    private final List<Player> players = new ArrayList<>();
 
     public void runServer() {
         socket.waitNewPlayers();
@@ -31,56 +25,18 @@ public class GameManager {
         playerIdByPort.get(port)
                 .setReady(true);
         if (playerIdByPort.values().stream().allMatch(Player::isReady) && playerIdByPort.size() == 2) {
-            this.playerIdByPort.values().forEach(player -> player.startGame(game.getCurMoveId(), players.size()));
-        }
-    }
-
-    public void reset() {
-        this.players.forEach(player -> player.setReady(false));
-        this.game.reset();
-    }
-
-    public void processPaintLineMsg(int port, PlayersMove move) {
-        int painterId = game.getCurMoveId();
-        PaintLineResult result = game.move(playerIdByPort.get(port), move);
-        if (result.type == PaintLineResultType.NEW_COLORED_CELLS) {
-            updateGameStatusForPlayers(painterId, move, result.colored_cells);
-        } else if (result.type == PaintLineResultType.FINISH) {
-            giveFinishResultToPlayers(painterId, move, result.colored_cells);
-            reset();
+            this.playerIdByPort.values().forEach(player -> player.startGame(game.getCurMoveId()));
         }
     }
 
     public void processPlayersMove(PlayersMove move, int port) {
         int painterId = game.getCurMoveId();
         PaintLineResult result = game.move(playerIdByPort.get(port), move);
-        if (result.type == PaintLineResultType.NEW_COLORED_CELLS) {
-            int cur_move_id = game.getCurMoveId();
-            this.playerIdByPort.values()
-                    .forEach(player -> player.updateGameStatus(painterId, move, result.colored_cells, cur_move_id));
-        } else if (result.type == PaintLineResultType.FINISH) {
-            giveFinishResultToPlayers(painterId, move, result.colored_cells);
-            reset();
+        switch (result.type) {
+            case NEW_COLORED_CELLS -> this.playerIdByPort.values()
+                    .forEach(player -> player.updateGameStatus(painterId, move, result.markedCells, game.getCurMoveId()));
+            case FINISH -> giveFinishResultToPlayers(painterId, move, result.markedCells);
         }
-    }
-
-    public void setReady(int port) {
-        players.get(playerIdByPort.get(port).getId()).setReady(true);
-    }
-
-    public void tryStartGame() {
-        for (Player player : players) {
-            if (!player.isReady()) {
-                return;
-            }
-        }
-        int cur_move_id = game.getCurMoveId();
-        this.players.forEach(player -> player.startGame(cur_move_id, players.size()));
-    }
-
-    public void updateGameStatusForPlayers(int painter_id, PlayersMove move, List<Integer> cells) {
-        int cur_move_id = game.getCurMoveId();
-        this.players.forEach(player -> player.updateGameStatus(painter_id, move, cells, cur_move_id));
     }
 
     public void giveFinishResultToPlayers(int painter_id, PlayersMove move, List<Integer> cells) {
@@ -94,12 +50,11 @@ public class GameManager {
             }
         }
 
-        for (Player player : players) {
-            player.giveFinishResult(painter_id, move, cells, score, winnerId);
-        }
+        int finalWinnerId = winnerId;
+        playerIdByPort.values().forEach(player -> player.finishGame(painter_id, move, cells, score, finalWinnerId));
     }
 
     public boolean canBeAddedPlayer() {
-        return players.size() < 2;
+        return playerIdByPort.values().size() < 2;
     }
 }

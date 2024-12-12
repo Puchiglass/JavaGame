@@ -59,7 +59,7 @@
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>
-                                ru.example.quoridor/ru.example.quoridor.client.Main
+                                ru.example.quoridor/ru.example.quoridor.client.CorridorGame
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>

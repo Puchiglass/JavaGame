@@ -2,7 +2,7 @@ package ru.example.quoridor.client;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.example.quoridor.messages.*;
+import ru.example.quoridor.model.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,7 +16,7 @@ public class SocketClient {
 
     private static final Logger log = LogManager.getLogger(SocketClient.class);
 
-    private final ClientManager manager = BClientManager.getManager();
+    private final ClientManager manager = ClientManager.getInstance();
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
     private Socket socket;
@@ -38,48 +38,11 @@ public class SocketClient {
         log.info("Client started");
     }
 
-    void run() {
-        while (true) {
-            try {
-                Object obj = ois.readObject();
-                if (obj instanceof Start msg) {
-                    System.out.println("Start message");
-                    manager.startGame(msg);
-                }
-                if (obj instanceof Update msg) {
-                    System.out.println("Update message");
-                    manager.updateGameStatus(msg);
-                }
-                if (obj instanceof Finish finish) {
-                    manager.finishGame(finish);
-                } else if (obj instanceof FinishGameMsg msg) {
-                    System.out.println("Finish message");
-                    manager.finishGame(msg);
-                }
-            }
-            catch (IOException e) {
-                log.error("Undefined message");
-            }
-            catch (ClassNotFoundException e) {
-                log.error(e.getMessage());
-            }
-        }
-    }
-
     public void sendReady(Ready ready) {
         try {
             oos.writeObject(ready);
         } catch (IOException e) {
             log.error("Failed to send ready message", e);
-        }
-    }
-
-    public void sendReady() {
-        try {
-            oos.writeObject(SignalMsg.READY);
-        }
-        catch (IOException e) {
-            log.error("Failed to send ready message");
         }
     }
 
@@ -89,6 +52,32 @@ public class SocketClient {
         }
         catch (IOException e) {
             log.error("Failed to send line message");
+        }
+    }
+
+    private void run() {
+        while (true) {
+            try {
+                Object obj = ois.readObject();
+                if (obj instanceof Start msg) {
+                    System.out.println("Start message");
+                    manager.startGame(msg);
+                }
+                if (obj instanceof Update msg) {
+                    System.out.println("Update message");
+                    manager.updateGame(msg);
+                }
+                if (obj instanceof Finish finish) {
+                    System.out.println("Finish message");
+                    manager.finishGame(finish);
+                }
+            }
+            catch (IOException e) {
+                log.error("Undefined message");
+            }
+            catch (ClassNotFoundException e) {
+                log.error(e.getMessage());
+            }
         }
     }
 

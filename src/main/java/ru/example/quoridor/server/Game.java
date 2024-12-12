@@ -1,22 +1,21 @@
 package ru.example.quoridor.server;
 
 import lombok.Getter;
-import ru.example.quoridor.messages.LineType;
-import ru.example.quoridor.messages.PaintingLine;
-import ru.example.quoridor.messages.PlayersMove;
+import ru.example.quoridor.model.LineType;
+import ru.example.quoridor.model.PaintLineResult;
+import ru.example.quoridor.model.PaintLineResultType;
+import ru.example.quoridor.model.PlayersMove;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
+import static ru.example.quoridor.property.Property.FIELD_SIZE;
+import static ru.example.quoridor.property.Property.TOTAL_CELLS;
+
 public class Game {
-    private static final int FIELD_SIZE = 3;
-    private static final int TOTAL_CELLS = FIELD_SIZE * FIELD_SIZE;
 
     @Getter
     private final List<Integer> playerScore = new ArrayList<>();
-    ;
     private final boolean[] verticalLines = new boolean[FIELD_SIZE * (FIELD_SIZE + 1)];
     private final boolean[] horizontalLines = new boolean[FIELD_SIZE * (FIELD_SIZE + 1)];
     private final int[] cells = new int[FIELD_SIZE * FIELD_SIZE];
@@ -30,18 +29,8 @@ public class Game {
         return new Player(playerScore.size() - 1, connection);
     }
 
-    public void reset() {
-        curMoveId = 0;
-        numColoredCells = 0;
-        Arrays.fill(verticalLines, false);
-        Arrays.fill(horizontalLines, false);
-        Arrays.fill(cells, 0);
-        Collections.fill(playerScore, 0);
-
-    }
-
-    private void colorCell(int cellInd, int playerId, List<Integer> coloredCells) {
-        coloredCells.add(cellInd);
+    private void markCell(int cellInd, int playerId, List<Integer> markedCells) {
+        markedCells.add(cellInd);
         playerScore.set(playerId, playerScore.get(playerId) + 1);
         numColoredCells++;
     }
@@ -55,44 +44,44 @@ public class Game {
                 || playerId < 0 || playerId >= playerScore.size() || playerId != curMoveId)
             return new PaintLineResult(PaintLineResultType.ERROR);
 
-        List<Integer> coloredCells = new ArrayList<>();
+        List<Integer> markedCells = new ArrayList<>();
         switch (move.type()) {
-            case HORIZONTAL -> handleHorizontalMove(lineId, playerId, coloredCells);
-            case VERTICAL -> handleVerticalMove(lineId, playerId, coloredCells);
+            case HORIZONTAL -> handleHorizontalMove(lineId, playerId, markedCells);
+            case VERTICAL -> handleVerticalMove(lineId, playerId, markedCells);
         }
-        if (coloredCells.isEmpty())
+        if (markedCells.isEmpty())
             curMoveId = (curMoveId + 1) % playerScore.size();
 
         if (numColoredCells == TOTAL_CELLS)
-            return new PaintLineResult(PaintLineResultType.FINISH, coloredCells);
+            return new PaintLineResult(PaintLineResultType.FINISH, markedCells);
 
-        return new PaintLineResult(PaintLineResultType.NEW_COLORED_CELLS, coloredCells);
+        return new PaintLineResult(PaintLineResultType.NEW_COLORED_CELLS, markedCells);
     }
 
-    private void handleVerticalMove(int lineId, int playerId, List<Integer> coloredCells) {
+    private void handleVerticalMove(int lineId, int playerId, List<Integer> markedCells) {
         verticalLines[lineId] = true;
         if (lineId % 4 == 0) {
             if (++cells[lineId / 4 * 3] == 4)
-                colorCell(lineId / 4 * 3, playerId, coloredCells);
+                markCell(lineId / 4 * 3, playerId, markedCells);
         } else if (lineId % 4 == 3) {
             if (++cells[lineId - 1 - lineId / 4] == 4)
-                colorCell(lineId - 1 - lineId / 4, playerId, coloredCells);
+                markCell(lineId - 1 - lineId / 4, playerId, markedCells);
         } else {
             if (++cells[lineId - lineId / 4] == 4)
-                colorCell(lineId - lineId / 4, playerId, coloredCells);
+                markCell(lineId - lineId / 4, playerId, markedCells);
             if (++cells[lineId - 1 - lineId / 4] == 4)
-                colorCell(lineId - 1 - lineId / 4, playerId, coloredCells);
+                markCell(lineId - 1 - lineId / 4, playerId, markedCells);
         }
     }
 
-    private void handleHorizontalMove(int lineId, int playerId, List<Integer> coloredCells) {
+    private void handleHorizontalMove(int lineId, int playerId, List<Integer> markedCells) {
         horizontalLines[lineId] = true;
         if (lineId < cells.length && ++cells[lineId] == 4) {
-            colorCell(lineId, playerId, coloredCells);
+            markCell(lineId, playerId, markedCells);
         }
 
         if (lineId - FIELD_SIZE >= 0 && ++cells[lineId - FIELD_SIZE] == 4) {
-            colorCell(lineId - 3, playerId, coloredCells);
+            markCell(lineId - 3, playerId, markedCells);
         }
     }
 }
