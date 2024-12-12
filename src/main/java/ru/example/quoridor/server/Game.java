@@ -42,49 +42,49 @@ public class Game {
     }
 
     public PaintLineResult paintLine(int playerId, PaintingLine line) {
-        if (line.index < 0 || line.index >= verticalLines.length ||
-                (line.type == LineType.VERTICAL && verticalLines[line.index]) ||
-                (line.type == LineType.HORIZONTAL && horizontalLines[line.index])) {
+        if (line.index() < 0 || line.index() >= verticalLines.length ||
+                (line.type() == LineType.VERTICAL && verticalLines[line.index()]) ||
+                (line.type() == LineType.HORIZONTAL && horizontalLines[line.index()])) {
             return new PaintLineResult(PaintLineResultType.INVALID_LINE);
         }
         if (playerId < 0 || playerId >= playerScore.size() || playerId != curMoveId) {
             return new PaintLineResult(PaintLineResultType.INVALID_PLAYER);
         }
 
-        if (line.type == LineType.VERTICAL) {
-            verticalLines[line.index] = true;
+        if (line.type() == LineType.VERTICAL) {
+            verticalLines[line.index()] = true;
         }
         else {
-            horizontalLines[line.index] = true;
+            horizontalLines[line.index()] = true;
         }
 
         ArrayList<Integer> coloredCells = new ArrayList<>();
-        if (line.type == LineType.HORIZONTAL) {
-            if (line.index < cells.length && ++cells[line.index] == 4) {
-                colorCell(line.index, playerId, coloredCells);
+        if (line.type() == LineType.HORIZONTAL) {
+            if (line.index() < cells.length && ++cells[line.index()] == 4) {
+                colorCell(line.index(), playerId, coloredCells);
             }
 
-            if (line.index - FIELD_SIZE >= 0 && ++cells[line.index - FIELD_SIZE] == 4) {
-                colorCell(line.index - 3, playerId, coloredCells);
+            if (line.index() - FIELD_SIZE >= 0 && ++cells[line.index() - FIELD_SIZE] == 4) {
+                colorCell(line.index() - 3, playerId, coloredCells);
             }
         }
         else {
-            if (line.index % 4 == 0) {
-                if (++cells[line.index / 4 * 3] == 4) {
-                    colorCell(line.index / 4 * 3, playerId, coloredCells);
+            if (line.index() % 4 == 0) {
+                if (++cells[line.index() / 4 * 3] == 4) {
+                    colorCell(line.index() / 4 * 3, playerId, coloredCells);
                 }
             }
-            else if (line.index % 4 == 3) {
-                if (++cells[line.index - 1 - line.index / 4] == 4) {
-                    colorCell(line.index - 1 - line.index / 4, playerId, coloredCells);
+            else if (line.index() % 4 == 3) {
+                if (++cells[line.index() - 1 - line.index() / 4] == 4) {
+                    colorCell(line.index() - 1 - line.index() / 4, playerId, coloredCells);
                 }
             }
             else {
-                if (++cells[line.index - line.index / 4] == 4) {
-                    colorCell(line.index - line.index / 4, playerId, coloredCells);
+                if (++cells[line.index() - line.index() / 4] == 4) {
+                    colorCell(line.index() - line.index() / 4, playerId, coloredCells);
                 }
-                if (++cells[line.index - 1 - line.index / 4] == 4) {
-                    colorCell(line.index - 1 - line.index / 4, playerId, coloredCells);
+                if (++cells[line.index() - 1 - line.index() / 4] == 4) {
+                    colorCell(line.index() - 1 - line.index() / 4, playerId, coloredCells);
                 }
             }
         }

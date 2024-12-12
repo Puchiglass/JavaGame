@@ -111,8 +111,8 @@ public class VisualController {
 
     public void finishGame(FinishGameMsg msg) {
         Platform.runLater(() -> {
-            updateField(msg.getPainterId(), msg.getLine(), msg.getCells());
-            finishWindow = new FinishWindow(msg.isWinner(), msg.getScore());
+            updateField(msg.painterId(), msg.line(), msg.cells());
+            finishWindow = new FinishWindow(msg.isWinner(), msg.score());
             finishWindow.show();
         });
     }
@@ -141,13 +141,13 @@ public class VisualController {
     }
 
     private void updateField(int painterId, PaintingLine line, ArrayList<Integer> coloredCells) {
-        if (line.type == LineType.HORIZONTAL) {
-            horizontalLines[line.index].setStroke(COLORS_FOR_PLAYERS[painterId]);
-            horizontalLines[line.index].toFront();
+        if (line.type() == LineType.HORIZONTAL) {
+            horizontalLines[line.index()].setStroke(COLORS_FOR_PLAYERS[painterId]);
+            horizontalLines[line.index()].toFront();
         }
         else {
-            verticalLines[line.index].setStroke(COLORS_FOR_PLAYERS[painterId]);
-            verticalLines[line.index].toFront();
+            verticalLines[line.index()].setStroke(COLORS_FOR_PLAYERS[painterId]);
+            verticalLines[line.index()].toFront();
         }
 
         for (int cellId : coloredCells) {
