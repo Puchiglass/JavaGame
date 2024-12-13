@@ -20,22 +20,18 @@ public class SocketServer {
 
     public void waitNewPlayers() {
         try {
-            InetAddress ip = InetAddress.getLocalHost();
-            ServerSocket ss = new ServerSocket(PORT, 0, ip);
-            Socket cs;
+            ServerSocket ss = new ServerSocket(PORT, 0, InetAddress.getLocalHost());
             System.out.printf("Server started on port %d%n", PORT);
             while (true) {
-                cs = ss.accept();
+                Socket cs = ss.accept();
                 if (!manager.canBeAddedPlayer()) {
                     cs.close();
                     continue;
                 }
                 System.out.printf("New client on port %d%n", cs.getPort());
-                ClientConnection cc = new ClientConnection(cs, manager);
-                manager.addNewPlayer(cc);
+                manager.addNewPlayer(new ClientConnection(cs, manager));
             }
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             log.error("Server start error");
         }
     }

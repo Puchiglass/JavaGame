@@ -76,12 +76,10 @@ public class Game {
 
     private void handleHorizontalMove(int lineId, int playerId, List<Integer> markedCells) {
         horizontalLines[lineId] = true;
-        if (lineId < cells.length && ++cells[lineId] == 4) {
+        if (lineId < cells.length && ++cells[lineId] == 4)
             markCell(lineId, playerId, markedCells);
-        }
 
-        if (lineId - FIELD_SIZE >= 0 && ++cells[lineId - FIELD_SIZE] == 4) {
+        if (lineId - FIELD_SIZE >= 0 && ++cells[lineId - FIELD_SIZE] == 4)
             markCell(lineId - 3, playerId, markedCells);
-        }
     }
 }

@@ -13,20 +13,18 @@ public class GameManager {
     private final SocketServer socket = new SocketServer(this);
     private final Map<Integer, Player> playerIdByPort = new HashMap<>();
 
-    public void runServer() {
+    public void start() {
         socket.waitNewPlayers();
     }
 
     public void addNewPlayer(ClientConnection connection) {
-        this.playerIdByPort.put(connection.getPort(), this.game.newPlayer(connection));
+        this.playerIdByPort.put(connection.getSocket().getPort(), this.game.newPlayer(connection));
     }
 
     public void processReadyMsg(int port) {
-        playerIdByPort.get(port)
-                .setReady(true);
-        if (playerIdByPort.values().stream().allMatch(Player::isReady) && playerIdByPort.size() == 2) {
+        playerIdByPort.get(port).setReady(true);
+        if (playerIdByPort.values().stream().allMatch(Player::isReady) && playerIdByPort.size() == 2)
             this.playerIdByPort.values().forEach(player -> player.startGame(game.getCurMoveId()));
-        }
     }
 
     public void processPlayersMove(PlayersMove move, int port) {

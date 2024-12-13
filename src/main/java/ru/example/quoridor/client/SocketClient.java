@@ -17,48 +17,46 @@ public class SocketClient {
     private static final Logger log = LogManager.getLogger(SocketClient.class);
 
     private final ClientManager manager = ClientManager.getInstance();
-    private ObjectInputStream ois;
-    private ObjectOutputStream oos;
+    private ObjectOutputStream objectOutputStream;
+    private ObjectInputStream objectInputStream;
     private Socket socket;
 
     public SocketClient() {
         try {
-            InetAddress ip = InetAddress.getLocalHost();
-            socket = new Socket(ip, PORT);
-            ois = new ObjectInputStream(socket.getInputStream());
-            oos = new ObjectOutputStream(socket.getOutputStream());
+            socket = new Socket(InetAddress.getLocalHost(), PORT);
+            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            objectInputStream = new ObjectInputStream(socket.getInputStream());
+            Thread thread = new Thread(this::run);
+            thread.setDaemon(true);
+            thread.start();
+            log.info("Client started");
         } catch (IOException e) {
             log.error("Failed to connect to the server", e);
             closeResources();
-            return;
-        }
-        Thread thread = new Thread(this::run);
-        thread.setDaemon(true);
-        thread.start();
-        log.info("Client started");
-    }
-
-    public void sendReady(Ready ready) {
-        try {
-            oos.writeObject(ready);
-        } catch (IOException e) {
-            log.error("Failed to send ready message", e);
         }
     }
 
     public void sendLine(int id, LineType type) {
         try {
-            oos.writeObject(new PlayersMove(type, id));
+            objectOutputStream.writeObject(new PlayersMove(type, id));
         }
         catch (IOException e) {
             log.error("Failed to send line message");
         }
     }
 
+    public void sendReady(Ready ready) {
+        try {
+            objectOutputStream.writeObject(ready);
+        } catch (IOException e) {
+            log.error("Failed to send ready message", e);
+        }
+    }
+
     private void run() {
         while (true) {
             try {
-                Object obj = ois.readObject();
+                Object obj = objectInputStream.readObject();
                 if (obj instanceof Start msg) {
                     System.out.println("Start message");
                     manager.startGame(msg);
@@ -83,8 +81,8 @@ public class SocketClient {
 
     private void closeResources() {
         try {
-            if (ois != null) ois.close();
-            if (oos != null) oos.close();
+            if (objectInputStream != null) objectInputStream.close();
+            if (objectOutputStream != null) objectOutputStream.close();
             if (socket != null) socket.close();
         } catch (IOException e) {
             log.error("Failed to close resources", e);
